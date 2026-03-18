@@ -280,11 +280,11 @@
       <div class="control-row">
         <span class="control-label">Posicao</span>
         <select id="position">
+          <option value="center" selected>Centro</option>
           <option value="bottom-right">Canto inferior direito</option>
           <option value="bottom-left">Canto inferior esquerdo</option>
           <option value="top-right">Canto superior direito</option>
           <option value="top-left">Canto superior esquerdo</option>
-          <option value="center">Centro</option>
         </select>
       </div>
       <div class="control-row">
@@ -463,6 +463,26 @@
     img.src = url;
   }
 
+  function processPhoto(file, cfg, tmpCanvas, tmpCtx) {
+    return new Promise(function(resolve) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function() {
+        tmpCanvas.width = img.width;
+        tmpCanvas.height = img.height;
+        tmpCtx.drawImage(img, 0, 0);
+        applyWatermark(tmpCtx, img.width, img.height, cfg);
+        var nameParts = file.name.split('.');
+        nameParts.pop();
+        var filename = nameParts.join('.') + '_marca_dagua.jpg';
+        var dataUrl = tmpCanvas.toDataURL('image/jpeg', 0.92);
+        URL.revokeObjectURL(url);
+        resolve({ filename: filename, data: dataUrl.split(',')[1] });
+      };
+      img.src = url;
+    });
+  }
+
   async function downloadAll() {
     if (!logoImg || photos.length === 0) return;
 
@@ -485,27 +505,8 @@
 
     for (var i = 0; i < photos.length; i++) {
       fill.style.width = Math.round((i / photos.length) * 85) + '%';
-      var file = photos[i];
-      await new Promise(function(res, idx) {
-        return function(res) {
-          var url = URL.createObjectURL(photos[idx]);
-          var img = new Image();
-          img.onload = function() {
-            tmpCanvas.width = img.width;
-            tmpCanvas.height = img.height;
-            tmpCtx.drawImage(img, 0, 0);
-            applyWatermark(tmpCtx, img.width, img.height, cfg);
-            var nameParts = photos[idx].name.split('.');
-            nameParts.pop();
-            var filename = nameParts.join('.') + '_marca_dagua.jpg';
-            var dataUrl = tmpCanvas.toDataURL('image/jpeg', 0.92);
-            zip.file(filename, dataUrl.split(',')[1], { base64: true });
-            URL.revokeObjectURL(url);
-            res();
-          };
-          img.src = url;
-        };
-      }(i));
+      var result = await processPhoto(photos[i], cfg, tmpCanvas, tmpCtx);
+      zip.file(result.filename, result.data, { base64: true });
     }
 
     fill.style.width = '92%';
