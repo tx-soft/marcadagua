@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Marca d'água para Imóveis</title>
+  <title>Marca d'agua para Imoveis - TXSoft</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,11 +23,30 @@
       align-items: center;
       justify-content: space-between;
     }
-    header .header-left { display: flex; align-items: center; gap: 12px; }
-    header .logo-text { font-size: 20px; font-weight: 600; color: #185FA5; }
-    header .logo-sub { font-size: 13px; color: #888; margin-left: 4px; }
-    header .brand { font-size: 18px; font-weight: 700; letter-spacing: 0.1em; color: #185FA5; }
-    header .brand span { color: #185FA5; }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-app-name {
+      font-size: 20px;
+      font-weight: 600;
+      color: #185FA5;
+    }
+
+    .header-app-sub {
+      font-size: 13px;
+      color: #888;
+    }
+
+    .header-brand {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #185FA5;
+    }
 
     .container { max-width: 860px; margin: 2rem auto; padding: 0 1.25rem; }
     .page-title { font-size: 22px; font-weight: 600; color: #111; margin-bottom: 4px; }
@@ -215,21 +234,21 @@
 
 <header>
   <div class="header-left">
-    <span class="logo-text">🏠 Marca d'água</span>
-    <span class="logo-sub">para imóveis</span>
+    <span class="header-app-name">&#127968; Marca d'agua</span>
+    <span class="header-app-sub">para imoveis</span>
   </div>
-  <div class="brand">TX<span>SOFT</span></div>
+  <span class="header-brand">TXSOFT</span>
 </header>
 
 <div class="container">
-  <h1 class="page-title">Adicionar marca d'água nas fotos</h1>
-  <p class="page-sub">Carregue seu logotipo e as fotos dos imóveis — o app aplica a marca d'água automaticamente.</p>
+  <h1 class="page-title">Adicionar marca d'agua nas fotos</h1>
+  <p class="page-sub">Carregue seu logotipo e as fotos dos imoveis - o app aplica a marca d'agua automaticamente.</p>
 
   <div class="panel">
     <div class="panel-title">1. Seu logotipo</div>
     <div class="drop-zone" id="logo-drop" onclick="document.getElementById('logo-input').click()">
       <div id="logo-empty">
-        <div class="drop-icon">🖼️</div>
+        <div class="drop-icon">&#128444;</div>
         <div class="drop-text">Clique para carregar seu logotipo</div>
         <div class="drop-sub">PNG com fundo transparente recomendado</div>
       </div>
@@ -245,21 +264,21 @@
   </div>
 
   <div class="panel">
-    <div class="panel-title">2. Fotos dos imóveis</div>
+    <div class="panel-title">2. Fotos dos imoveis</div>
     <div class="drop-zone" id="photos-drop" onclick="document.getElementById('photos-input').click()">
-      <div class="drop-icon">📷</div>
+      <div class="drop-icon">&#128247;</div>
       <div class="drop-text">Clique para selecionar as fotos</div>
-      <div class="drop-sub">Selecione uma ou várias fotos (JPG, PNG, WEBP)</div>
+      <div class="drop-sub">Selecione uma ou varias fotos (JPG, PNG, WEBP)</div>
     </div>
     <input type="file" id="photos-input" accept="image/*" multiple>
     <div class="thumbs" id="thumbs-row"></div>
   </div>
 
   <div class="panel">
-    <div class="panel-title">3. Configurações da marca d'água</div>
+    <div class="panel-title">3. Configuracoes da marca d'agua</div>
     <div class="controls">
       <div class="control-row">
-        <span class="control-label">Posição</span>
+        <span class="control-label">Posicao</span>
         <select id="position">
           <option value="bottom-right">Canto inferior direito</option>
           <option value="bottom-left">Canto inferior esquerdo</option>
@@ -287,10 +306,10 @@
   </div>
 
   <div class="panel">
-    <div class="panel-title">Pré-visualização</div>
+    <div class="panel-title">Pre-visualizacao</div>
     <div class="preview-area">
       <div class="placeholder" id="placeholder">
-        <div style="font-size:36px;margin-bottom:10px;">🏠</div>
+        <div style="font-size:36px;margin-bottom:10px;">&#127968;</div>
         Carregue uma foto e o logotipo para visualizar
       </div>
       <canvas id="canvas" style="display:none;"></canvas>
@@ -301,12 +320,12 @@
   </div>
 
   <div class="btn-row">
-    <button id="preview-btn" onclick="renderPreview()" disabled>Atualizar prévia</button>
-    <button class="primary" id="download-btn" onclick="downloadAll()" disabled>⬇ Baixar fotos com marca d'água</button>
+    <button id="preview-btn" onclick="renderPreview()" disabled>Atualizar previa</button>
+    <button class="primary" id="download-btn" onclick="downloadAll()" disabled>&#8595; Baixar fotos com marca d'agua</button>
   </div>
 </div>
 
-<footer>txsoft.com.br — Ferramenta gratuita para corretores de imóveis</footer>
+<footer>txsoft.com.br - Ferramenta gratuita para corretores de imoveis</footer>
 
 <script>
   let logoImg = null;
@@ -317,24 +336,24 @@
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
 
-  document.getElementById('size').oninput = e => { document.getElementById('size-val').textContent = e.target.value + '%'; renderPreview(); };
-  document.getElementById('opacity').oninput = e => { document.getElementById('opacity-val').textContent = e.target.value + '%'; renderPreview(); };
-  document.getElementById('margin').oninput = e => { document.getElementById('margin-val').textContent = e.target.value + 'px'; renderPreview(); };
-  document.getElementById('position').onchange = () => renderPreview();
+  document.getElementById('size').oninput = function(e) { document.getElementById('size-val').textContent = e.target.value + '%'; renderPreview(); };
+  document.getElementById('opacity').oninput = function(e) { document.getElementById('opacity-val').textContent = e.target.value + '%'; renderPreview(); };
+  document.getElementById('margin').oninput = function(e) { document.getElementById('margin-val').textContent = e.target.value + 'px'; renderPreview(); };
+  document.getElementById('position').onchange = function() { renderPreview(); };
 
   function setupDrop(zone, inputId, handler) {
-    zone.ondragover = e => { e.preventDefault(); zone.classList.add('drag-over'); };
-    zone.ondragleave = () => zone.classList.remove('drag-over');
-    zone.ondrop = e => { e.preventDefault(); zone.classList.remove('drag-over'); handler(e.dataTransfer.files); };
-    document.getElementById(inputId).onchange = e => handler(e.target.files);
+    zone.ondragover = function(e) { e.preventDefault(); zone.classList.add('drag-over'); };
+    zone.ondragleave = function() { zone.classList.remove('drag-over'); };
+    zone.ondrop = function(e) { e.preventDefault(); zone.classList.remove('drag-over'); handler(e.dataTransfer.files); };
+    document.getElementById(inputId).onchange = function(e) { handler(e.target.files); };
   }
 
-  setupDrop(document.getElementById('logo-drop'), 'logo-input', files => {
+  setupDrop(document.getElementById('logo-drop'), 'logo-input', function(files) {
     if (!files[0]) return;
     if (logoObjectUrl) URL.revokeObjectURL(logoObjectUrl);
     logoObjectUrl = URL.createObjectURL(files[0]);
     logoImg = new Image();
-    logoImg.onload = () => {
+    logoImg.onload = function() {
       document.getElementById('logo-empty').style.display = 'none';
       document.getElementById('logo-loaded').style.display = 'flex';
       document.getElementById('logo-preview-img').src = logoObjectUrl;
@@ -345,7 +364,7 @@
     logoImg.src = logoObjectUrl;
   });
 
-  setupDrop(document.getElementById('photos-drop'), 'photos-input', files => {
+  setupDrop(document.getElementById('photos-drop'), 'photos-input', function(files) {
     photos = photos.concat(Array.from(files));
     rebuildThumbs();
     updateButtons();
@@ -353,25 +372,25 @@
   });
 
   function rebuildThumbs() {
-    const thumbsRow = document.getElementById('thumbs-row');
+    var thumbsRow = document.getElementById('thumbs-row');
     thumbsRow.innerHTML = '';
-    photos.forEach((f, i) => {
-      const wrap = document.createElement('div');
+    photos.forEach(function(f, i) {
+      var wrap = document.createElement('div');
       wrap.className = 'thumb-wrap';
 
-      const img = document.createElement('img');
+      var img = document.createElement('img');
       img.className = 'thumb' + (i === currentIdx ? ' active' : '');
       img.src = URL.createObjectURL(f);
-      img.onclick = () => {
+      img.onclick = function() {
         currentIdx = i;
-        thumbsRow.querySelectorAll('.thumb').forEach((t, j) => t.classList.toggle('active', j === i));
+        thumbsRow.querySelectorAll('.thumb').forEach(function(t, j) { t.classList.toggle('active', j === i); });
         renderPreview();
       };
 
-      const del = document.createElement('div');
+      var del = document.createElement('div');
       del.className = 'thumb-delete';
       del.innerHTML = '&times;';
-      del.onclick = (e) => {
+      del.onclick = function(e) {
         e.stopPropagation();
         photos.splice(i, 1);
         if (currentIdx >= photos.length) currentIdx = Math.max(0, photos.length - 1);
@@ -392,12 +411,12 @@
   }
 
   function updateButtons() {
-    const ready = logoImg && photos.length > 0;
+    var ready = logoImg && photos.length > 0;
     document.getElementById('preview-btn').disabled = !ready;
     document.getElementById('download-btn').disabled = !ready;
     document.getElementById('download-btn').textContent = photos.length > 0
-      ? `⬇ Baixar ${photos.length} foto${photos.length > 1 ? 's' : ''} em ZIP`
-      : `⬇ Baixar fotos com marca d'água`;
+      ? 'Baixar ' + photos.length + ' foto' + (photos.length > 1 ? 's' : '') + ' em ZIP'
+      : "Baixar fotos com marca d'agua";
   }
 
   function getConfig() {
@@ -411,17 +430,15 @@
 
   function applyWatermark(c, w, h, cfg) {
     if (!logoImg) return;
-    const logoW = Math.round(w * cfg.size);
-    const logoH = Math.round(logoW * (logoImg.height / logoImg.width));
-    let x, y;
-    const m = cfg.margin;
-    switch (cfg.position) {
-      case 'bottom-right': x = w - logoW - m; y = h - logoH - m; break;
-      case 'bottom-left':  x = m; y = h - logoH - m; break;
-      case 'top-right':    x = w - logoW - m; y = m; break;
-      case 'top-left':     x = m; y = m; break;
-      case 'center':       x = Math.round((w - logoW) / 2); y = Math.round((h - logoH) / 2); break;
-    }
+    var logoW = Math.round(w * cfg.size);
+    var logoH = Math.round(logoW * (logoImg.height / logoImg.width));
+    var x, y;
+    var m = cfg.margin;
+    if (cfg.position === 'bottom-right') { x = w - logoW - m; y = h - logoH - m; }
+    else if (cfg.position === 'bottom-left') { x = m; y = h - logoH - m; }
+    else if (cfg.position === 'top-right') { x = w - logoW - m; y = m; }
+    else if (cfg.position === 'top-left') { x = m; y = m; }
+    else { x = Math.round((w - logoW) / 2); y = Math.round((h - logoH) / 2); }
     c.save();
     c.globalAlpha = cfg.opacity;
     c.drawImage(logoImg, x, y, logoW, logoH);
@@ -430,11 +447,11 @@
 
   function renderPreview() {
     if (!logoImg || photos.length === 0) return;
-    const cfg = getConfig();
-    const file = photos[currentIdx];
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
+    var cfg = getConfig();
+    var file = photos[currentIdx];
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function() {
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
@@ -454,55 +471,55 @@
       return;
     }
 
-    const cfg = getConfig();
-    const btn = document.getElementById('download-btn');
-    const bar = document.getElementById('progress-bar');
-    const fill = document.getElementById('progress-fill');
+    var cfg = getConfig();
+    var btn = document.getElementById('download-btn');
+    var bar = document.getElementById('progress-bar');
+    var fill = document.getElementById('progress-fill');
     btn.disabled = true;
     bar.style.display = 'block';
     fill.style.width = '0%';
 
-    const zip = new JSZip();
-    const tmpCanvas = document.createElement('canvas');
-    const tmpCtx = tmpCanvas.getContext('2d');
+    var zip = new JSZip();
+    var tmpCanvas = document.createElement('canvas');
+    var tmpCtx = tmpCanvas.getContext('2d');
 
-    for (let i = 0; i < photos.length; i++) {
+    for (var i = 0; i < photos.length; i++) {
       fill.style.width = Math.round((i / photos.length) * 85) + '%';
-      const file = photos[i];
-      await new Promise(res => {
-        const url = URL.createObjectURL(file);
-        const img = new Image();
-        img.onload = () => {
-          tmpCanvas.width = img.width;
-          tmpCanvas.height = img.height;
-          tmpCtx.drawImage(img, 0, 0);
-          applyWatermark(tmpCtx, img.width, img.height, cfg);
-          const nameParts = file.name.split('.');
-          nameParts.pop();
-          const filename = nameParts.join('.') + '_marca_dagua.jpg';
-          const dataUrl = tmpCanvas.toDataURL('image/jpeg', 0.92);
-          zip.file(filename, dataUrl.split(',')[1], { base64: true });
-          URL.revokeObjectURL(url);
-          res();
+      var file = photos[i];
+      await new Promise(function(res, idx) {
+        return function(res) {
+          var url = URL.createObjectURL(photos[idx]);
+          var img = new Image();
+          img.onload = function() {
+            tmpCanvas.width = img.width;
+            tmpCanvas.height = img.height;
+            tmpCtx.drawImage(img, 0, 0);
+            applyWatermark(tmpCtx, img.width, img.height, cfg);
+            var nameParts = photos[idx].name.split('.');
+            nameParts.pop();
+            var filename = nameParts.join('.') + '_marca_dagua.jpg';
+            var dataUrl = tmpCanvas.toDataURL('image/jpeg', 0.92);
+            zip.file(filename, dataUrl.split(',')[1], { base64: true });
+            URL.revokeObjectURL(url);
+            res();
+          };
+          img.src = url;
         };
-        img.src = url;
-      });
+      }(i));
     }
 
     fill.style.width = '92%';
-
-    const blob = await zip.generateAsync({ type: 'blob' });
-
+    var blob = await zip.generateAsync({ type: 'blob' });
     fill.style.width = '100%';
 
-    const a = document.createElement('a');
+    var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = 'fotos_marca_dagua.zip';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
 
-    setTimeout(() => {
+    setTimeout(function() {
       bar.style.display = 'none';
       fill.style.width = '0%';
       btn.disabled = false;
