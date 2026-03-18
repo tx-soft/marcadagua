@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marca d'água para Imóveis</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f4f4f0;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e0e0d8;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header .header-left { display: flex; align-items: center; gap: 12px; }
+    header .logo-text { font-size: 20px; font-weight: 600; color: #185FA5; }
+    header .logo-sub { font-size: 13px; color: #888; margin-left: 4px; }
+    header .brand { font-size: 14px; font-weight: 700; letter-spacing: 0.1em; color: #fff; background: #185FA5; padding: 5px 14px; border-radius: 6px; }
+    header .brand span { color: #7ec8f7; }
+
+    .container { max-width: 860px; margin: 2rem auto; padding: 0 1.25rem; }
+    .page-title { font-size: 22px; font-weight: 600; color: #111; margin-bottom: 4px; }
+    .page-sub { font-size: 14px; color: #666; margin-bottom: 1.75rem; }
+
+    .panel {
+      background: #fff;
+      border: 1px solid #e0e0d8;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .panel-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #999;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .drop-zone {
+      border: 1.5px dashed #c0c0b8;
+      border-radius: 8px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .drop-zone:hover { background: #f8f8f4; border-color: #185FA5; }
+    .drop-zone.drag-over { background: #e8f0fb; border-color: #185FA5; }
+
+    .drop-icon { font-size: 30px; margin-bottom: 8px; }
+    .drop-text { font-size: 14px; color: #444; }
+    .drop-sub { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+    .logo-preview-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 4px 0;
+    }
+
+    .logo-preview-img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid #e0e0d8;
+      background: repeating-conic-gradient(#e8e8e8 0% 25%, #fff 0% 50%) 0 0 / 10px 10px;
+      flex-shrink: 0;
+    }
+
+    .logo-preview-info { text-align: left; }
+    .logo-preview-name { font-size: 13px; font-weight: 600; color: #111; margin-bottom: 4px; word-break: break-all; }
+    .logo-preview-change { font-size: 12px; color: #185FA5; }
+
+    .thumbs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .thumb-wrap {
+      position: relative;
+      width: 76px;
+      height: 76px;
+      flex-shrink: 0;
+    }
+
+    .thumb {
+      width: 76px;
+      height: 76px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.15s, border-color 0.15s;
+      display: block;
+    }
+
+    .thumb:hover { opacity: 0.85; }
+    .thumb.active { opacity: 1; border-color: #185FA5; }
+
+    .thumb-delete {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #e25e5e;
+      color: #fff;
+      font-size: 13px;
+      line-height: 18px;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid #fff;
+      font-weight: 700;
+      display: none;
+      z-index: 2;
+    }
+
+    .thumb-wrap:hover .thumb-delete { display: block; }
+    .thumb-delete:hover { background: #c0392b; }
+
+    .controls { display: grid; gap: 14px; }
+    .control-row { display: flex; align-items: center; gap: 12px; }
+    .control-label { font-size: 13px; color: #555; min-width: 100px; }
+    .control-value { font-size: 13px; font-weight: 600; min-width: 42px; color: #111; }
+
+    input[type=range] { flex: 1; accent-color: #185FA5; cursor: pointer; }
+
+    select {
+      font-size: 13px;
+      padding: 7px 12px;
+      border: 1px solid #d0d0c8;
+      border-radius: 8px;
+      background: #fff;
+      color: #111;
+      cursor: pointer;
+      outline: none;
+    }
+
+    select:focus { border-color: #185FA5; }
+
+    .preview-area {
+      background: #f0f0ec;
+      border-radius: 8px;
+      min-height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    canvas { display: block; max-width: 100%; max-height: 420px; border-radius: 8px; }
+    .placeholder { text-align: center; color: #bbb; font-size: 14px; }
+
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1rem; }
+
+    button {
+      font-size: 13px;
+      font-family: inherit;
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: 1px solid #d0d0c8;
+      background: #fff;
+      color: #111;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    button:hover { background: #f4f4f0; }
+    button.primary { background: #185FA5; color: #fff; border-color: #185FA5; font-weight: 500; }
+    button.primary:hover { background: #0C447C; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .progress-bar {
+      height: 4px;
+      background: #e8e8e4;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .progress-fill { height: 100%; background: #185FA5; border-radius: 2px; transition: width 0.15s; }
+
+    input[type=file] { display: none; }
+
+    footer { text-align: center; font-size: 12px; color: #bbb; padding: 2rem 0 1.5rem; }
+
+    @media (max-width: 600px) {
+      .control-row { flex-wrap: wrap; }
+      .control-label { min-width: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <span class="logo-text">🏠 Marca d'água</span>
+    <span class="logo-sub">para imóveis</span>
+  </div>
+  <div class="brand">TX<span>SOFT</span></div>
+</header>
+
+<div class="container">
+  <h1 class="page-title">Adicionar marca d'água nas fotos</h1>
+  <p class="page-sub">Carregue seu logotipo e as fotos dos imóveis — o app aplica a marca d'água automaticamente.</p>
+
+  <div class="panel">
+    <div class="panel-title">1. Seu logotipo</div>
+    <div class="drop-zone" id="logo-drop" onclick="document.getElementById('logo-input').click()">
+      <div id="logo-empty">
+        <div class="drop-icon">🖼️</div>
+        <div class="drop-text">Clique para carregar seu logotipo</div>
+        <div class="drop-sub">PNG com fundo transparente recomendado</div>
+      </div>
+      <div id="logo-loaded" style="display:none;" class="logo-preview-wrap">
+        <img id="logo-preview-img" class="logo-preview-img" src="" alt="logo">
+        <div class="logo-preview-info">
+          <div class="logo-preview-name" id="logo-preview-name">logo.png</div>
+          <div class="logo-preview-change">Clique para trocar o logotipo</div>
+        </div>
+      </div>
+    </div>
+    <input type="file" id="logo-input" accept="image/*">
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">2. Fotos dos imóveis</div>
+    <div class="drop-zone" id="photos-drop" onclick="document.getElementById('photos-input').click()">
+      <div class="drop-icon">📷</div>
+      <div class="drop-text">Clique para selecionar as fotos</div>
+      <div class="drop-sub">Selecione uma ou várias fotos (JPG, PNG, WEBP)</div>
+    </div>
+    <input type="file" id="photos-input" accept="image/*" multiple>
+    <div class="thumbs" id="thumbs-row"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">3. Configurações da marca d'água</div>
+    <div class="controls">
+      <div class="control-row">
+        <span class="control-label">Posição</span>
+        <select id="position">
+          <option value="bottom-right">Canto inferior direito</option>
+          <option value="bottom-left">Canto inferior esquerdo</option>
+          <option value="top-right">Canto superior direito</option>
+          <option value="top-left">Canto superior esquerdo</option>
+          <option value="center">Centro</option>
+        </select>
+      </div>
+      <div class="control-row">
+        <span class="control-label">Tamanho</span>
+        <input type="range" id="size" min="5" max="60" value="25" step="1">
+        <span class="control-value" id="size-val">25%</span>
+      </div>
+      <div class="control-row">
+        <span class="control-label">Opacidade</span>
+        <input type="range" id="opacity" min="10" max="100" value="80" step="1">
+        <span class="control-value" id="opacity-val">80%</span>
+      </div>
+      <div class="control-row">
+        <span class="control-label">Margem</span>
+        <input type="range" id="margin" min="0" max="60" value="16" step="1">
+        <span class="control-value" id="margin-val">16px</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Pré-visualização</div>
+    <div class="preview-area">
+      <div class="placeholder" id="placeholder">
+        <div style="font-size:36px;margin-bottom:10px;">🏠</div>
+        Carregue uma foto e o logotipo para visualizar
+      </div>
+      <canvas id="canvas" style="display:none;"></canvas>
+    </div>
+    <div class="progress-bar" id="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button id="preview-btn" onclick="renderPreview()" disabled>Atualizar prévia</button>
+    <button class="primary" id="download-btn" onclick="downloadAll()" disabled>⬇ Baixar fotos com marca d'água</button>
+  </div>
+</div>
+
+<footer>txsoft.com.br — Ferramenta gratuita para corretores de imóveis</footer>
+
+<script>
+  let logoImg = null;
+  let logoObjectUrl = null;
+  let photos = [];
+  let currentIdx = 0;
+
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  document.getElementById('size').oninput = e => { document.getElementById('size-val').textContent = e.target.value + '%'; renderPreview(); };
+  document.getElementById('opacity').oninput = e => { document.getElementById('opacity-val').textContent = e.target.value + '%'; renderPreview(); };
+  document.getElementById('margin').oninput = e => { document.getElementById('margin-val').textContent = e.target.value + 'px'; renderPreview(); };
+  document.getElementById('position').onchange = () => renderPreview();
+
+  function setupDrop(zone, inputId, handler) {
+    zone.ondragover = e => { e.preventDefault(); zone.classList.add('drag-over'); };
+    zone.ondragleave = () => zone.classList.remove('drag-over');
+    zone.ondrop = e => { e.preventDefault(); zone.classList.remove('drag-over'); handler(e.dataTransfer.files); };
+    document.getElementById(inputId).onchange = e => handler(e.target.files);
+  }
+
+  setupDrop(document.getElementById('logo-drop'), 'logo-input', files => {
+    if (!files[0]) return;
+    if (logoObjectUrl) URL.revokeObjectURL(logoObjectUrl);
+    logoObjectUrl = URL.createObjectURL(files[0]);
+    logoImg = new Image();
+    logoImg.onload = () => {
+      document.getElementById('logo-empty').style.display = 'none';
+      document.getElementById('logo-loaded').style.display = 'flex';
+      document.getElementById('logo-preview-img').src = logoObjectUrl;
+      document.getElementById('logo-preview-name').textContent = files[0].name;
+      updateButtons();
+      renderPreview();
+    };
+    logoImg.src = logoObjectUrl;
+  });
+
+  setupDrop(document.getElementById('photos-drop'), 'photos-input', files => {
+    photos = photos.concat(Array.from(files));
+    rebuildThumbs();
+    updateButtons();
+    renderPreview();
+  });
+
+  function rebuildThumbs() {
+    const thumbsRow = document.getElementById('thumbs-row');
+    thumbsRow.innerHTML = '';
+    photos.forEach((f, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'thumb-wrap';
+
+      const img = document.createElement('img');
+      img.className = 'thumb' + (i === currentIdx ? ' active' : '');
+      img.src = URL.createObjectURL(f);
+      img.onclick = () => {
+        currentIdx = i;
+        thumbsRow.querySelectorAll('.thumb').forEach((t, j) => t.classList.toggle('active', j === i));
+        renderPreview();
+      };
+
+      const del = document.createElement('div');
+      del.className = 'thumb-delete';
+      del.innerHTML = '&times;';
+      del.onclick = (e) => {
+        e.stopPropagation();
+        photos.splice(i, 1);
+        if (currentIdx >= photos.length) currentIdx = Math.max(0, photos.length - 1);
+        rebuildThumbs();
+        updateButtons();
+        if (photos.length > 0) {
+          renderPreview();
+        } else {
+          canvas.style.display = 'none';
+          document.getElementById('placeholder').style.display = 'block';
+        }
+      };
+
+      wrap.appendChild(img);
+      wrap.appendChild(del);
+      thumbsRow.appendChild(wrap);
+    });
+  }
+
+  function updateButtons() {
+    const ready = logoImg && photos.length > 0;
+    document.getElementById('preview-btn').disabled = !ready;
+    document.getElementById('download-btn').disabled = !ready;
+    document.getElementById('download-btn').textContent = photos.length > 0
+      ? `⬇ Baixar ${photos.length} foto${photos.length > 1 ? 's' : ''} em ZIP`
+      : `⬇ Baixar fotos com marca d'água`;
+  }
+
+  function getConfig() {
+    return {
+      position: document.getElementById('position').value,
+      size: parseInt(document.getElementById('size').value) / 100,
+      opacity: parseInt(document.getElementById('opacity').value) / 100,
+      margin: parseInt(document.getElementById('margin').value)
+    };
+  }
+
+  function applyWatermark(c, w, h, cfg) {
+    if (!logoImg) return;
+    const logoW = Math.round(w * cfg.size);
+    const logoH = Math.round(logoW * (logoImg.height / logoImg.width));
+    let x, y;
+    const m = cfg.margin;
+    switch (cfg.position) {
+      case 'bottom-right': x = w - logoW - m; y = h - logoH - m; break;
+      case 'bottom-left':  x = m; y = h - logoH - m; break;
+      case 'top-right':    x = w - logoW - m; y = m; break;
+      case 'top-left':     x = m; y = m; break;
+      case 'center':       x = Math.round((w - logoW) / 2); y = Math.round((h - logoH) / 2); break;
+    }
+    c.save();
+    c.globalAlpha = cfg.opacity;
+    c.drawImage(logoImg, x, y, logoW, logoH);
+    c.restore();
+  }
+
+  function renderPreview() {
+    if (!logoImg || photos.length === 0) return;
+    const cfg = getConfig();
+    const file = photos[currentIdx];
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      applyWatermark(ctx, img.width, img.height, cfg);
+      canvas.style.display = 'block';
+      document.getElementById('placeholder').style.display = 'none';
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  }
+
+  async function downloadAll() {
+    if (!logoImg || photos.length === 0) return;
+
+    if (typeof JSZip === 'undefined') {
+      alert('Aguarde um instante e tente novamente.');
+      return;
+    }
+
+    const cfg = getConfig();
+    const btn = document.getElementById('download-btn');
+    const bar = document.getElementById('progress-bar');
+    const fill = document.getElementById('progress-fill');
+    btn.disabled = true;
+    bar.style.display = 'block';
+    fill.style.width = '0%';
+
+    const zip = new JSZip();
+    const tmpCanvas = document.createElement('canvas');
+    const tmpCtx = tmpCanvas.getContext('2d');
+
+    for (let i = 0; i < photos.length; i++) {
+      fill.style.width = Math.round((i / photos.length) * 85) + '%';
+      const file = photos[i];
+      await new Promise(res => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          tmpCanvas.width = img.width;
+          tmpCanvas.height = img.height;
+          tmpCtx.drawImage(img, 0, 0);
+          applyWatermark(tmpCtx, img.width, img.height, cfg);
+          const nameParts = file.name.split('.');
+          nameParts.pop();
+          const filename = nameParts.join('.') + '_marca_dagua.jpg';
+          const dataUrl = tmpCanvas.toDataURL('image/jpeg', 0.92);
+          zip.file(filename, dataUrl.split(',')[1], { base64: true });
+          URL.revokeObjectURL(url);
+          res();
+        };
+        img.src = url;
+      });
+    }
+
+    fill.style.width = '92%';
+
+    const blob = await zip.generateAsync({ type: 'blob' });
+
+    fill.style.width = '100%';
+
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'fotos_marca_dagua.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    setTimeout(() => {
+      bar.style.display = 'none';
+      fill.style.width = '0%';
+      btn.disabled = false;
+    }, 1000);
+  }
+</script>
+
+</body>
+</html>
